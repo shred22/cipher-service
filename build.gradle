@@ -11,6 +11,7 @@ plugins {
 	id 'net.researchgate.release' version '2.8.1'
 	id 'maven-publish'
 }
+
 group = 'com.cipher.service'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
@@ -32,14 +33,14 @@ publishing {
 			def snapshotRepoUrl = 'http://localhost:8081/repository/internal-snapshots/'
 			url = version.endsWith('SNAPSHOT') ? snapshotRepoUrl : releaseRepoUrl
 			credentials {
-				username = "$System.env.DEPLOY_USER"
-				password = "$System.env.DEPLOY_PASS"
+				username "$mavenUser"
+				password "$mavenPassword"
 			}
 		}
 	}
 	publications {
 		ipc3_payment_controller(MavenPublication) {
-			artifactId = 'tms-upload-cli'
+			artifactId = 'cipher-service'
 			from(components.java)
 		}
 	}
@@ -78,3 +79,5 @@ release {
 
 	}
 }
+
+afterReleaseBuild.dependsOn publish
