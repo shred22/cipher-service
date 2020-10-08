@@ -1,0 +1,80 @@
+buildscript {
+	repositories {
+		mavenCentral()
+		maven { url 'http://localhost:8081/repository/internal-releases/' }
+	}
+}
+plugins {
+	id 'org.springframework.boot' version '2.3.4.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+	id 'java'
+	id 'net.researchgate.release' version '2.8.1'
+	id 'maven-publish'
+}
+group = 'com.cipher.service'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+publishing {
+	repositories {
+		maven {
+			def releaseRepoUrl = 'http://localhost:8081/repository/internal-releases/'
+			def snapshotRepoUrl = 'http://localhost:8081/repository/internal-snapshots/'
+			url = version.endsWith('SNAPSHOT') ? snapshotRepoUrl : releaseRepoUrl
+			credentials {
+				username = "$System.env.DEPLOY_USER"
+				password = "$System.env.DEPLOY_PASS"
+			}
+		}
+	}
+	publications {
+		ipc3_payment_controller(MavenPublication) {
+			artifactId = 'tms-upload-cli'
+			from(components.java)
+		}
+	}
+}
+
+dependencies {
+	// https://mvnrepository.com/artifact/org.beryx/text-io
+	implementation 'org.beryx:text-io:3.0.0'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+}
+
+test {
+	useJUnitPlatform()
+}
+
+release {
+	preTagCommitMessage = '[Release]: '
+	tagCommitMessage = '[Release]: creating tag '
+	newVersionCommitMessage = '[Release]: new snapshot version '
+	tagTemplate = 'v${version}'
+	git {
+		requireBranch = 'master'
+		pushToRemote = 'origin'
+		pushToBranchPrefix = ''
+		commitVersionFileOnly = false
+		signTag = false
+
+	}
+}
