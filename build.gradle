@@ -38,10 +38,13 @@ publishing {
 		}
 	}
 	publications {
-		ipc3_payment_controller(MavenPublication) {
+		maven(MavenPublication) {
+			groupId = 'com.cipher.service'
 			artifactId = 'cipher-service'
-			from(components.java)
+			version = "2.0.0"
+			from components.java
 		}
+
 	}
 }
 
